@@ -534,17 +534,8 @@ with st.sidebar:
     st.markdown(f"🕐 **{datetime.now().strftime('%I:%M %p')}**")
     
     st.markdown("---")
-    
-    # FIXED LOGOUT BUTTON
-    if st.button("🚪 LOGOUT", use_container_width=True, key="logout_btn"):
-        # Clear authentication state
-        st.session_state['name'] = None
-        st.session_state['authentication_status'] = None
-        st.session_state['username'] = None
-        st.session_state['logout'] = True
-        
-        # Force page reload
-        st.rerun()
+    if st.button("🚪 LOGOUT", use_container_width=True):
+        user_manager.logout()
 
 # ==================== DASHBOARD PAGE ====================
 if page == "📊 Dashboard":
@@ -938,21 +929,21 @@ elif page == "📚 Model Comparison":
             font=dict(color='#8EB69B', family='Inter')
         )
         st.plotly_chart(fig, use_container_width=True)
-    
+   
     # Confusion matrices
     st.subheader("🎲 Confusion Matrix Analysis")
     col1, col2, col3 = st.columns(3)
-    
     with col1:
-        st.image(str(DATA_DIR / "Random_Forest_confusion_matrix.png"), caption="Random Forest", use_container_width=True)
+        st.image(str(DATA_DIR / "Random_Forest_confusion_matrix.png"), caption="Random Forest")
     with col2:
-        st.image(str(DATA_DIR / "XGBoost_confusion_matrix.png"), caption="XGBoost", use_container_width=True)
+        st.image(str(DATA_DIR / "XGBoost_confusion_matrix.png"), caption="XGBoost")
     with col3:
-        st.image(str(DATA_DIR / "Neural_Network_confusion_matrix.png"), caption="Neural Network", use_container_width=True)
-    
+        st.image(str(DATA_DIR / "Neural_Network_confusion_matrix.png"), caption="Neural Network")
+
     # ROC Curves
     st.subheader("📈 ROC Curve Comparative Analysis")
-    st.image(str(DATA_DIR / "roc_curves_comparison.png"), use_container_width=True)
+    st.image(str(DATA_DIR / "roc_curves_comparison.png"))
+
 
 # ==================== AUDIT LOGS (ADMIN ONLY) ====================
 elif page == "📋 Audit Logs" and user_role == "admin":

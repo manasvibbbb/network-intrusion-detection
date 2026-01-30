@@ -1,4 +1,3 @@
-
 import streamlit as st
 import yaml
 import streamlit_authenticator as stauth
@@ -32,22 +31,57 @@ class UserManager:
             if key not in self.config["cookie"]:
                 raise KeyError(f"Missing cookie.{key} in config.yaml")
         
-        self.authenticator = stauth.Authenticate(
-            self.config["credentials"],
-            self.config["cookie"]["name"],
-            self.config["cookie"]["key"],
-            self.config["cookie"]["expiry_days"],
-        )
+        # Force initialize session state to prevent KeyError
+        for key in ['name', 'authentication_status', 'username', 'logout']:
+            if key not in st.session_state:
+                st.session_state[key] = None
+        
+        try:
+            self.authenticator = stauth.Authenticate(
+                self.config["credentials"],
+                self.config["cookie"]["name"],
+                self.config["cookie"]["key"],
+                self.config["cookie"]["expiry_days"],
+            )
+        except Exception as e:
+            # If authenticator fails, reset session
+            st.session_state['name'] = None
+            st.session_state['authentication_status'] = None
+            st.session_state['username'] = None
+            raise e
     
     def login(self):
-        self.authenticator.login(location="main")
+        """Display login form and return authentication status"""
+        # Wrapper to handle corrupted cookies
+        try:
+            self.authenticator.login(form_name="Login", location="main")
+        except (KeyError, AttributeError) as e:
+            # Cookie corrupted - force reset
+            st.warning("⚠️ Session expired. Please login again.")
+            st.session_state['name'] = None
+            st.session_state['authentication_status'] = None
+            st.session_state['username'] = None
+            st.stop()
+        
         name = st.session_state.get("name")
         authentication_status = st.session_state.get("authentication_status")
         username = st.session_state.get("username")
+        
         return name, authentication_status, username
     
     def logout(self):
-        self.authenticator.logout(location="sidebar")
+        """Handle logout and clear session state"""
+        try:
+            self.authenticator.logout(location="sidebar")
+        except:
+            pass
+        
+        st.session_state['logout'] = True
+        st.session_state['name'] = None
+        st.session_state['authentication_status'] = None
+        st.session_state['username'] = None
+        
+        st.rerun()
     
     def get_user_role(self, username):
         return self.config["credentials"].get("usernames", {}).get(username, {}).get("role", "viewer")
