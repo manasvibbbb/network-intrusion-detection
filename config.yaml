@@ -1,0 +1,17 @@
+credentials:
+  usernames:
+    admin:
+      email: admin@intrusion-detection.com
+      name: System Administrator
+      password: $2b$12$e.zJZbPp4pTuSPhNizDmneqKoojqlhUWIdwEKJUXynlokxiBNhDUG
+      role: admin
+    analyst1:
+      email: analyst1@intrusion-detection.com
+      name: Security Analyst
+      password: $2b$12$vRb8BxXVnWO8P7f3IcIy2ep/zTb5ByMErLcvjCRhwgbK1fJUYw4eC
+      role: viewer
+
+cookie:
+  expiry_days: 30
+  key: some_signature_key_123456789abcdefghijklmnopqrstuvwxyz
+  name: intrusion_detection_cookie

@@ -1,0 +1,2 @@
+
+echo libgomp1 > packages.txt
