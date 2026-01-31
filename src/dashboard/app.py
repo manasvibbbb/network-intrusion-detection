@@ -666,19 +666,211 @@ if page == "📊 Dashboard":
 elif page == "🔍 Live Prediction":
     st.header("🔍 Real-Time Threat Detection")
     
+    # Help section toggle
+    if 'show_instructions' not in st.session_state:
+        st.session_state['show_instructions'] = True
+    
+    col_help, col_space = st.columns([1, 5])
+    with col_help:
+        if st.button("❓ Toggle Instructions"):
+            st.session_state['show_instructions'] = not st.session_state['show_instructions']
+    
+    # Step-by-step instructions
+    if st.session_state['show_instructions']:
+        st.info("""
+        ### 📚 How to Use This Tool (3 Simple Steps)
+        
+        **Step 1:** Download a sample CSV file below (choose any threat scenario)  
+        **Step 2:** Select your preferred AI model (XGBoost recommended - 80.24% accuracy)  
+        **Step 3:** Upload the CSV file and click "RUN THREAT ANALYSIS"
+        
+        💡 **Tip:** Try the "Mixed Traffic" sample to see both normal and attack detections!
+        """)
+    
     col1, col2 = st.columns([2,1])
     
     with col1:
         st.markdown("### 📤 Upload Network Traffic Data")
-        st.info("📄 Upload CSV file containing network traffic features for AI-powered threat analysis.")
+        st.info("📄 **Choose one option:** Download a sample CSV below **OR** upload your own network traffic data.")
     
     with col2:
         model_choice = st.selectbox(
             "🤖 AI Model Selection",
             ["Random Forest", "XGBoost", "Neural Network"],
+            index=1,  # XGBoost as default
             help="Choose the machine learning model for prediction analysis"
         )
     
+    # Sample Files Section with descriptions
+    st.markdown("### 📦 Pre-Built Sample Test Files")
+    st.markdown("*Click any button below to download realistic network traffic samples:*")
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        with st.expander("ℹ️ About Normal Traffic"):
+            st.write("**What it contains:**")
+            st.write("- 15 legitimate HTTP connections")
+            st.write("- Low bandwidth usage")
+            st.write("- Standard service requests")
+            st.write("- ✅ Expected: 100% Normal")
+        
+        # Normal Traffic Sample
+        normal_data = pd.DataFrame(np.zeros((15, len(FEATURE_NAMES))), columns=FEATURE_NAMES)
+        normal_data['logged_in'] = 1
+        normal_data['count'] = 2
+        normal_data['srv_count'] = 2
+        normal_data['same_srv_rate'] = 1.0
+        normal_data['dst_host_count'] = 30
+        normal_data['dst_host_srv_count'] = 30
+        normal_data['dst_host_same_srv_rate'] = 1.0
+        normal_data['src_bytes'] = 200
+        normal_data['dst_bytes'] = 200
+        normal_csv = normal_data.to_csv(index=False)
+        st.download_button(
+            "🟢 Normal Traffic",
+            normal_csv,
+            "normal_traffic_sample.csv",
+            "text/csv",
+            help="Clean network traffic (15 samples)",
+            use_container_width=True
+        )
+    
+    with col2:
+        with st.expander("ℹ️ About DDoS Attack"):
+            st.write("**What it contains:**")
+            st.write("- 15 extreme DDoS samples")
+            st.write("- SYN flood patterns")
+            st.write("- Very high connection counts")
+            st.write("- 🔴 Expected: 100% Attack")
+        
+        # DDoS Attack Sample - FIXED with UNIQUE characteristics
+        ddos_data = pd.DataFrame(np.zeros((15, len(FEATURE_NAMES))), columns=FEATURE_NAMES)
+        ddos_data['duration'] = 0
+        ddos_data['src_bytes'] = 0
+        ddos_data['dst_bytes'] = 0
+        ddos_data['logged_in'] = 0
+        ddos_data['count'] = 9999  # EXTREME: Flooding with packets
+        ddos_data['srv_count'] = 9999  # SAME: Flooding same service
+        ddos_data['serror_rate'] = 1.0  # Maximum errors
+        ddos_data['srv_serror_rate'] = 1.0
+        ddos_data['same_srv_rate'] = 1.0  # KEY: Flooding SAME service ✅
+        ddos_data['diff_srv_rate'] = 0.0  # Not trying different services
+        ddos_data['srv_diff_host_rate'] = 0.0
+        ddos_data['dst_host_count'] = 255
+        ddos_data['dst_host_srv_count'] = 255  # Higher than Port Scan
+        ddos_data['dst_host_same_srv_rate'] = 1.0  # Targeting same service
+        ddos_data['dst_host_diff_srv_rate'] = 0.0  # Not varying
+        ddos_data['dst_host_same_src_port_rate'] = 1.0
+        ddos_data['dst_host_srv_diff_host_rate'] = 0.0
+        ddos_data['dst_host_serror_rate'] = 1.0
+        ddos_data['dst_host_srv_serror_rate'] = 1.0
+        ddos_data['dst_host_rerror_rate'] = 0.0
+        ddos_data['dst_host_srv_rerror_rate'] = 0.0
+        ddos_csv = ddos_data.to_csv(index=False)
+        st.download_button(
+            "🔴 DDoS Attack",
+            ddos_csv,
+            "ddos_attack_sample.csv",
+            "text/csv",
+            help="Extreme DDoS attack (15 samples)",
+            use_container_width=True
+        )
+    
+    with col3:
+        with st.expander("ℹ️ About Port Scan"):
+            st.write("**What it contains:**")
+            st.write("- 15 port scanning samples")
+            st.write("- Reconnaissance patterns")
+            st.write("- Multiple service probes")
+            st.write("- 🟡 Expected: 100% Attack")
+        
+        # Port Scan Sample - FIXED with UNIQUE characteristics
+        port_scan_data = pd.DataFrame(np.zeros((15, len(FEATURE_NAMES))), columns=FEATURE_NAMES)
+        port_scan_data['duration'] = 0
+        port_scan_data['src_bytes'] = 0
+        port_scan_data['dst_bytes'] = 0
+        port_scan_data['logged_in'] = 0
+        port_scan_data['count'] = 511  # MODERATE: Testing many ports
+        port_scan_data['srv_count'] = 100  # DIFFERENT: Each service tried once
+        port_scan_data['serror_rate'] = 0.95  # High but not max
+        port_scan_data['srv_serror_rate'] = 0.95
+        port_scan_data['rerror_rate'] = 1.0  # Reset errors = port closed
+        port_scan_data['srv_rerror_rate'] = 1.0
+        port_scan_data['same_srv_rate'] = 0.0  # KEY: Scanning DIFFERENT services ✅
+        port_scan_data['diff_srv_rate'] = 1.0  # Trying different ports
+        port_scan_data['srv_diff_host_rate'] = 1.0
+        port_scan_data['dst_host_count'] = 255
+        port_scan_data['dst_host_srv_count'] = 100  # Lower than DDoS
+        port_scan_data['dst_host_same_srv_rate'] = 0.0  # Different services
+        port_scan_data['dst_host_diff_srv_rate'] = 1.0
+        port_scan_data['dst_host_same_src_port_rate'] = 0.0
+        port_scan_data['dst_host_srv_diff_host_rate'] = 1.0
+        port_scan_data['dst_host_serror_rate'] = 0.95
+        port_scan_data['dst_host_srv_serror_rate'] = 0.95
+        port_scan_data['dst_host_rerror_rate'] = 1.0
+        port_scan_data['dst_host_srv_rerror_rate'] = 1.0
+        port_scan_csv = port_scan_data.to_csv(index=False)
+        st.download_button(
+            "🟡 Port Scan",
+            port_scan_csv,
+            "port_scan_sample.csv",
+            "text/csv",
+            help="Aggressive port scan (15 samples)",
+            use_container_width=True
+        )
+    
+    with col4:
+        with st.expander("ℹ️ About Mixed Traffic"):
+            st.write("**What it contains:**")
+            st.write("- 5 normal connections")
+            st.write("- 10 attack samples")
+            st.write("- Realistic mix scenario")
+            st.write("- 🟣 Expected: 33% Normal, 67% Attack")
+        
+        # Mixed Traffic Sample - COMPLETELY FIXED
+        mixed_data = pd.DataFrame(np.zeros((15, len(FEATURE_NAMES))), columns=FEATURE_NAMES)
+        
+        # First 5 rows (0-4): Normal traffic with STRONG normal signals
+        mixed_data.loc[0:4, 'logged_in'] = 1
+        mixed_data.loc[0:4, 'count'] = 5  # Low count = normal
+        mixed_data.loc[0:4, 'srv_count'] = 5
+        mixed_data.loc[0:4, 'same_srv_rate'] = 1.0
+        mixed_data.loc[0:4, 'src_bytes'] = 250
+        mixed_data.loc[0:4, 'dst_bytes'] = 250
+        mixed_data.loc[0:4, 'dst_host_count'] = 50
+        mixed_data.loc[0:4, 'dst_host_srv_count'] = 50
+        mixed_data.loc[0:4, 'dst_host_same_srv_rate'] = 1.0
+        mixed_data.loc[0:4, 'serror_rate'] = 0.0  # CRITICAL: No errors = normal
+        mixed_data.loc[0:4, 'srv_serror_rate'] = 0.0
+        
+        # Last 10 rows (5-14): Attack traffic with STRONG attack signals
+        mixed_data.loc[5:14, 'logged_in'] = 0  # Not logged in = suspicious
+        mixed_data.loc[5:14, 'count'] = 9999  # Very high count = attack
+        mixed_data.loc[5:14, 'srv_count'] = 9999
+        mixed_data.loc[5:14, 'serror_rate'] = 1.0  # High error rate = attack
+        mixed_data.loc[5:14, 'srv_serror_rate'] = 1.0
+        mixed_data.loc[5:14, 'same_srv_rate'] = 1.0
+        mixed_data.loc[5:14, 'dst_host_count'] = 255
+        mixed_data.loc[5:14, 'dst_host_srv_count'] = 255
+        mixed_data.loc[5:14, 'dst_host_serror_rate'] = 1.0
+        mixed_data.loc[5:14, 'dst_host_srv_serror_rate'] = 1.0
+        mixed_data.loc[5:14, 'src_bytes'] = 0  # Zero bytes = attack
+        mixed_data.loc[5:14, 'dst_bytes'] = 0
+        
+        mixed_csv = mixed_data.to_csv(index=False)
+        st.download_button(
+            "🟣 Mixed Traffic",
+            mixed_csv,
+            "mixed_traffic_sample.csv",
+            "text/csv",
+            help="5 normal + 10 attack samples",
+            use_container_width=True
+        )
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # File uploader with enhanced instructions
     uploaded = st.file_uploader(
         "📁 Drag and drop or browse CSV files",
         type="csv",
@@ -695,6 +887,10 @@ elif page == "🔍 Live Prediction":
         
         st.markdown("<br>", unsafe_allow_html=True)
         
+        # Highlight next step
+        if st.session_state['show_instructions']:
+            st.info("👉 **Next Step:** Click the button below to analyze your uploaded data!")
+        
         col1, col2, col3 = st.columns([1,2,1])
         with col2:
             if st.button("🚀 RUN THREAT ANALYSIS", use_container_width=True):
@@ -710,6 +906,11 @@ elif page == "🔍 Live Prediction":
                         model = nn_model
                         probs = model.predict(data).flatten()
                     
+                    # CRITICAL FIX: Models trained with inverted labels (0=attack, 1=normal)
+                    # Flip probabilities so code interprets correctly (1=attack, 0=normal)
+                    probs = 1 - probs
+                    
+                    # Convert probabilities to predictions
                     preds = (probs > 0.5).astype(int)
                     
                     # Update session state
@@ -730,8 +931,8 @@ elif page == "🔍 Live Prediction":
                     
                     result_df = pd.DataFrame({
                         "Sample ID": range(len(preds)),
-                        "Prediction": ["🔴 Attack" if p else "🟢 Normal" for p in preds],
-                        "Confidence": probs,
+                        "Prediction": ["🔴 Attack" if p == 1 else "🟢 Normal" for p in preds],
+                        "Confidence": [p if p > 0.5 else 1-p for p in probs],
                         "Risk Level": ["High" if p > 0.8 else "Medium" if p > 0.5 else "Low" for p in probs]
                     })
                     
@@ -764,26 +965,42 @@ elif page == "🔍 Live Prediction":
                         key='download-csv',
                         use_container_width=True
                     )
+                    
+                    # Post-analysis instructions
+                    if st.session_state['show_instructions']:
+                        st.info("""
+                        ### ✨ What's Next?
+                        
+                        - **View Dashboard:** Check the "📊 Dashboard" page for updated statistics
+                        - **Compare Models:** Try different AI models to compare accuracy
+                        - **Test More Samples:** Download another sample type to see different threat patterns
+                        - **Export Results:** Use the export button above to save your analysis
+                        """)
     else:
-        st.warning("👆 Upload a CSV file to initiate threat detection analysis")
-        
-        # Sample data generator
-        st.markdown("### 🧪 Need Test Data?")
-        col1, col2, col3 = st.columns([1,2,1])
-        with col2:
-            if st.button("📦 GENERATE SAMPLE DATASET", use_container_width=True):
-                sample_data = pd.DataFrame(
-                    np.random.rand(20, len(FEATURE_NAMES)),
-                    columns=FEATURE_NAMES
-                )
-                csv = sample_data.to_csv(index=False)
-                st.download_button(
-                    "📥 Download Sample CSV",
-                    csv,
-                    "sample_network_traffic.csv",
-                    "text/csv",
-                    use_container_width=True
-                )
+        st.warning("👆 **Choose an option:** Download a demo CSV file above OR upload your own network traffic CSV")
+        # Quick start guide
+        if st.session_state['show_instructions']:
+            st.markdown("### 🎯 Quick Start Guide")
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.markdown("""
+                **For Beginners:**
+                1. Click "🟣 Mixed Traffic" button
+                2. Upload the downloaded file
+                3. Click "🚀 RUN THREAT ANALYSIS"
+                4. See both normal and attack detections!
+                """)
+            
+            with col2:
+                st.markdown("""
+                **For Testing:**
+                - Try **Normal Traffic** (should be 100% clean)
+                - Try **DDoS Attack** (should be 100% threats)
+                - Try **Port Scan** (different from DDoS!)
+                - Compare different AI models
+                - Check accuracy on Dashboard page
+                """)
 
 # ==================== HISTORICAL ANALYTICS PAGE ====================
 elif page == "📈 Historical Analytics":
