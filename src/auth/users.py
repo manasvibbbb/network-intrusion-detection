@@ -9,7 +9,7 @@ from pathlib import Path
 
 class UserManager:
     def __init__(self):
-        BASE_DIR = Path(__file__).resolve().parents[3]
+        BASE_DIR = Path(__file__).resolve().parents[2]
         config_path = BASE_DIR / "config.yaml"
         
         if not config_path.exists():
