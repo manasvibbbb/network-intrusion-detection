@@ -1,5 +1,7 @@
 # src/dashboard/app.py
 # PROFESSIONAL DARK TEAL CYBERSECURITY THEME
+import os
+os.environ['STREAMLIT_CONFIG_FILE'] = 'false' 
 
 import streamlit as st
 import pandas as pd
