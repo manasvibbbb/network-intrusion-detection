@@ -12,6 +12,9 @@ import sys
 from pathlib import Path
 
 
+st._config_file._clear_cache()  # Bypass config.toml BOM
+
+
 # ===== PATH SETUP =====
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # network-intrusion-detection/
 SRC_DIR = BASE_DIR / "src"
