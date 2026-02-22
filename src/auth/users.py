@@ -54,7 +54,7 @@ class UserManager:
         """Display login form and return authentication status"""
         # Wrapper to handle corrupted cookies
         try:
-            self.authenticator.login(form_name="Login", location="main")
+            name, authentication_status, username = self.authenticator.login()
         except (KeyError, AttributeError) as e:
             # Cookie corrupted - force reset
             st.warning("⚠️ Session expired. Please login again.")

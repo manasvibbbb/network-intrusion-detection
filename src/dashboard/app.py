@@ -5,16 +5,16 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
-from tensorflow import keras
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import sys
 from pathlib import Path
 
-# ==================== PATH SETUP ====================
-SRC_DIR = Path(__file__).resolve().parents[1]
-BASE_DIR = SRC_DIR.parent
+
+# ===== PATH SETUP =====
+BASE_DIR = Path(__file__).resolve().parent.parent.parent  # network-intrusion-detection/
+SRC_DIR = BASE_DIR / "src"
 MODEL_DIR = BASE_DIR / "models"
 DATA_DIR = BASE_DIR / "data"
 
@@ -430,6 +430,7 @@ user_manager, db_manager = init_managers()
 # ==================== LOAD MODELS ====================
 @st.cache_resource
 def load_models():
+    import keras
     rf_model = joblib.load(MODEL_DIR / "random_forest.pkl")
     xgb_model = joblib.load(MODEL_DIR / "xgboost.pkl")
     nn_model = keras.models.load_model(MODEL_DIR / "neural_network.h5")
@@ -491,14 +492,15 @@ name, auth_status, username = user_manager.login()
 
 if auth_status is False:
     st.error("❌ Invalid credentials")
-    st.stop()
+    st.stop
 elif auth_status is None:
-    st.warning("👆 Please login to access the system")
-    st.info("**Demo Credentials:**\n- **Admin:** admin / admin123\n- **Analyst:** analyst1 / viewer123")
-    st.stop()
+    st.warning("Please login to access the system")
+    st.info("**Demo Credentials:**\n- Admin: `admin` / `password`\n- Analyst: `analyst1` / `password`")
+    st.stop
 
 user_role = user_manager.get_user_role(username)
 user_manager.log_action(username, "login")
+
 
 # ==================== HEADER ====================
 col1, col2 = st.columns([4,1])
