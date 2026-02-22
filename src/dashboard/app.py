@@ -495,7 +495,7 @@ if auth_status is False:
     st.stop
 elif auth_status is None:
     st.warning("Please login to access the system")
-    st.info("**Demo Credentials:**\n- Admin: `admin` / `admin123`\n- Analyst: `analyst1` / `analyst123`")
+    st.info("**Demo Credentials:**\n- Admin: `admin` / `admin123`\n- Analyst: `analyst1` / `analy`")
     st.stop
 
 user_role = user_manager.get_user_role(username)
