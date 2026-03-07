@@ -11,7 +11,7 @@ credentials:
       password: $2b$12$vRb8BxXVnWO8P7f3IcIy2ep/zTb5ByMErLcvjCRhwgbK1fJUYw4eC
       role: viewer
 
-
+      
 cookie:
   expiry_days: 30
   key: "RENDER_SECURE_PRODUCTION_KEY_2026_abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"
