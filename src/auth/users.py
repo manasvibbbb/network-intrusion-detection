@@ -51,22 +51,19 @@ class UserManager:
             raise e
     
     def login(self):
-        """Display login form and return authentication status"""
-        # Wrapper to handle corrupted cookies
         try:
-            name, authentication_status, username = self.authenticator.login()
+            self.authenticator.login()  # Don't unpack — it returns None in newer versions
         except (KeyError, AttributeError) as e:
-            # Cookie corrupted - force reset
             st.warning("⚠️ Session expired. Please login again.")
             st.session_state['name'] = None
             st.session_state['authentication_status'] = None
             st.session_state['username'] = None
             st.stop()
-        
+
         name = st.session_state.get("name")
         authentication_status = st.session_state.get("authentication_status")
         username = st.session_state.get("username")
-        
+
         return name, authentication_status, username
     
     def logout(self):
