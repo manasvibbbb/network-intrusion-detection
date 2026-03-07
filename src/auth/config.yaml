@@ -1,0 +1,20 @@
+cookie:
+  expiry_days: 30
+  key: random_signature_key_12345
+  name: nids_cookie
+credentials:
+  usernames:
+    admin:
+      email: admin@nids.com
+      name: Admin User
+      password: $2b$12$LQv3ZX5o5o.Tm3qXJZ5mJuLRwq3ZX5o5o.Tm3qXJZ5mJuLRwq3ZX5
+      role: admin
+    analyst1:
+      email: analyst1@nids.com
+      name: Security Analyst
+      password: $2b$12$MQv3ZX5o5o.Tm3qXJZ5mJuLRwq3ZX5o5o.Tm3qXJZ5mJuLRwq3ZX6
+      role: analyst
+preauthorized:
+  emails:
+    - admin@nids.com
+    - analyst1@nids.com
