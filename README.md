@@ -19,6 +19,11 @@ An AI-powered network intrusion detection system using machine learning to ident
 - Optional **authentication** for controlled access to the dashboard.
 
 ---
+## 🌐 Live Demo
+
+The app is deployed and accessible at: [https://network-intrusion-detection-tnax.onrender.com](https://network-intrusion-detection-tnax.onrender.com)
+
+---
 
 ## 🚀 Quick Start
 
